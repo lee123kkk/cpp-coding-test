@@ -1,0 +1,17 @@
+//월드 코드 챌린지 시즌1
+
+#include <vector>
+#include <set>
+
+using namespace std;
+
+vector<int> solution(vector<int> numbers) { 
+    set<int> sum; // ❶ 두 수의 합을 저장할 저장공간 선언
+
+    for(int i = 0;i<numbers.size();++i)  // ❷ 반복문을 수행하면서 두 수의 합을 저장
+        for(int j = i+1 ; j< numbers.size();++j)
+           sum.insert(numbers[i] + numbers[j]); 
+
+    vector<int> answer(sum.begin(), sum.end()); // ❸ 반환타입을 맞추기 위헤 벡터로 변환
+    return answer; 
+}
