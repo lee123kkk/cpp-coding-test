@@ -1,0 +1,80 @@
+/*
+문제 설명
+이진 트리를 표현한 배열 nodes를 인수로 받습니다.
+예를 들어서 nodes가 [1,2,3,4,5,6,7]이면 다음과 같은 트리를 표현할 것입니다.
+
+해당 이진 트리에 대하여 전위순회, 중위 순회, 후위 순회 결과를 각각 순서대로 문자열로 담은 배열을 반환하는 solution() 함수를 구현하세요.
+
+제약 조건
+입력 노드값의 개수는 1개 이상 1000개 이하이다.
+노드값은 정수이며, 중복되지 않는다.
+
+*/
+/////////////////////////////////////////////////////////////////////////////////////
+
+
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+// 전위순회
+string preorder(const vector<int>& nodes, int idx) {  //값에 의한 전달: 속도가 느림 
+  if (idx < nodes.size()) {
+    string ret = to_string(nodes[idx]) + " ";   //나
+    ret += preorder(nodes, idx * 2 + 1);        //왼쪽
+    ret += preorder(nodes, idx * 2 + 2);        //오른쪽
+    return ret;
+  } 
+  
+  return "";
+}
+
+// 중위순회
+string inorder(const vector<int>& nodes, int idx) { //참조에 의한 전달: 벡터의 위치 가져옴
+  if (idx < nodes.size()) {
+    string ret = inorder(nodes, idx * 2 + 1);  //왼쪽
+    ret += to_string(nodes[idx]) + " ";        //나
+    ret += inorder(nodes, idx * 2 + 2);        //오른쪽 
+    return ret;
+  } 
+  
+  return "";
+}
+
+// 후위순회
+string postorder(const vector<int>& nodes, int idx) { //상속 참조 전달 (윈본을 공유하되 읽기만 하고 수정 불가)
+  if (idx < nodes.size()) {
+    string ret = postorder(nodes, idx * 2 + 1); //왼쪽
+    ret += postorder(nodes, idx * 2 + 2);       //오른쪽
+    ret += to_string(nodes[idx]) + " ";         //루트
+    return ret;
+  } 
+  
+  return "";
+}
+
+vector<string> solution(const vector<int>& nodes) {
+  vector<string> result;
+  string pre = preorder(nodes, 0);
+  string in = inorder(nodes, 0);
+  string post = postorder(nodes, 0);
+
+  // 마지막 공백을 제거한 결과를 result에 추가
+  pre.pop_back();
+  in.pop_back();
+  post.pop_back();
+
+  result.push_back(pre);
+  result.push_back(in);
+  result.push_back(post);
+
+  return result;
+}
+
+
+
+
+
+
