@@ -1,0 +1,95 @@
+/*
+문제 설명
+lst 배열에 있는 값을 통해 이진 탐색 트리를 생성하고, 이 이진 트리 탐색으로 search_lst배열의 각 원소가 어디에 있는지 확인합니다.
+각 원소가 이진 탐색 트리에 존재하면 true, 없으면 flase를 반환하는 함수 solution()을 작성하세요.
+
+제약 조건
+lst는 정수로 이루어져 있으며 1,000,000개를 초과하지 않습니다.
+이진 탐색 트리의 삽입과 탐색 기능을 구현해야 합니다.
+search_lst의 길이는 10 이하입니다.
+*/
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+#include <vector>
+using namespace std;
+
+// ❶ 노드를 정의
+class Node {
+public:
+  int val;
+  Node *left, *right;
+
+  Node(int key) : val(key), left(nullptr), right(nullptr) {}
+};
+
+//❷ 이진 탐색 트리 정의
+class BST {
+private:
+  Node* root;
+
+  
+  Node* insertNode(Node* node, int key) {
+    if (!node) {
+      return new Node(key);
+    }
+    //❸ 키 값과 현재 노드의 값을 비교해서 이진탐색트리 규칙에 맞는 위치로 이동
+    if (key < node->val) {
+      node->left = insertNode(node->left, key);
+    } else {
+      node->right = insertNode(node->right, key);
+    }
+    return node;
+  }
+
+  bool searchNode(Node* node, int key) {
+    //❹ 찾는 키 값이 없는 경우 
+    if (!node) {
+      return false;
+    }
+    //❺ 이진탐색트리에서 키 값을 찾은 경우
+    if (key == node->val) {
+      return true;
+    }
+    //❻ 아직 값을 찾지 못한 경우, 현재 노드값과 key 값을 비교해서, 어느 노드에서 탐색할지 결정
+    return key < node->val ? 
+           searchNode(node->left, key) : 
+           searchNode(node->right, key);
+  }
+
+public:
+  BST() : root(nullptr) {}
+
+  void insert(int key) {
+    root = insertNode(root, key);
+  }
+
+  bool search(int key) {
+    return searchNode(root, key);
+  }
+};
+
+vector<bool> solution(vector<int> lst, vector<int> search_lst) {
+  BST bst;
+  // 이진 탐색 트리에 노드 삽입
+  for (int key : lst) {
+    bst.insert(key);
+  }
+
+  vector<bool> result;
+  // 이진 탐색 트리에서 찾는 값이 있는지 확인하고 탐색결과를 result에 추가
+  for (int search_val : search_lst) {
+    result.push_back(bst.search(search_val));
+  }
+
+  return result;
+}
+
+
+
+
+
+
+
