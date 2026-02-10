@@ -1,0 +1,61 @@
+/*
+너비 우선 탐색으로 모든 노드를 순회하는 함수 solution을 작성하세요.
+시작 노드는 정수형 start로 주어집니다.
+graph 배열은 [출발노드, 도착 노드]쌍이 들어있는 배열입니다.
+반환값은 그래프의 시작노드부터 모든 노드를 너비 우선 탐색한 경로가 순서대로 저장된 배열입니다.
+
+제약 조건
+노드의 최대 개수가 100개를 넘지 않습니다.
+시작 노드부터 시작해서 모든 노드를 방문할 수 있는 경로가 항상 있습니다.
+그래프의 각 노드는 숫자입니다.
+*/
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include <queue> //대기열 관리를 위한 큐
+#include <unordered_map> //그래프 저장
+#include <unordered_set> //방문 체크(중복 제거)
+#include <vector> //동적 배열
+
+using namespace std;
+
+unordered_map<int, vector<int>> adjList; //그래프(인접리스트)
+vector<int> result; //탐색 결과 저장
+
+void bfs(int start) {
+  unordered_set<int> visited; //이미 방문한 노드 기록
+  queue<int> q; // FIFO(선입 선출)
+
+  // ❶ 시작 노드 방문
+  q.push(start);  //큐에 넣음
+  visited.insert(start); //방문 표시
+  result.push_back(start); //결과 기록
+
+  while (!q.empty()) { //대기열이 다 찰때 까지
+    int node = q.front(); //가장 앞의 자료
+    q.pop(); //큐에서 내보내기
+
+    // ❷ 현재 노드와 인접한 노드 중 아직 방문하지 않는 노드 방문
+    for (int neighbor : adjList[node]) {
+      if (visited.find(neighbor) == visited.end()) {
+        q.push(neighbor);
+        visited.insert(neighbor);
+        result.push_back(neighbor);
+      }
+    }
+  }
+}
+                                 
+vector<int> solution(vector<pair<int, int>> graph, int start) {  // pair[출발, 도착]
+  // ❸ 인접 리스트 생성                        
+  for (auto &edge : graph) {            //auto가 edge의 값을 pair<int, int>로 자동 추론
+    int u = edge.first;
+    int v = edge.second;
+    adjList[u].push_back(v); //u번 노드에 v추가
+  }
+
+  // ❹ 시작 노드부터 너비 우선 탐색 시작
+  bfs(start);
+
+  return result;
+}
+
+
