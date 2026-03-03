@@ -1,0 +1,91 @@
+/*
+당신은 폰켓몬을 잡기위해서 오랜 여행 끝에 홍 박사님 연구소에 도착했습니다.
+홍 박사님은 당신에게 연구실에 있는 N마리의 포켓몬 중 N/2마리를 가져가도 좋다고 하셨습니다.
+홍 박사님의 연구실의 폰켓몬은 종류에 따라서 변호를 붙여 구분합니다.
+같은 종류은 폰켓몬은 같은 번호를 가집니다.
+예를 들어서 연구실에 총 4마리의 폰켓몬이 있고 각 폰켓몬의 번호가 [3번, 1번, 2번, 3번]이면 이는 3번 폰켓몬 2마리, 2번 폰켓몬 1마리, 1번 폰켓몬 1마리가 있는겁입니다.
+이 때 4마리의 폰켓몬 중에서 절반인 2마리를 고르는 방법은 6가지가 있습니다.
+
+이떄 3번 폰켓몬과 3번 폰켓몬을 선택한느 방법은 한 종류의 폰켓몬만 가지는 것이지만, 다른 경우는 모두 두 종류의 폰켓몬을 가질 수 있습니다.
+따라서 지금 예에서는 가질 수 있는 폰켄몬의 최대 종류는 2가지입니다.
+당신은 최대한 다양한 종류의 폰켓몬을 가지기를 원합니다.
+N마리 폰켓몬의 종류 번호가 담긴 배열 nums가 매개변수로 주어질 때 N/2마리의 폰켓몬을 선택하는 방법 중 가장 많은 종류의 폰켓몬을 선택하는 방법을 찾아서 폰켓몬 종류 번호의 개수를 반환하는 solution함수를 완성해주세요.
+
+제약 조건
+nums는 폰켓몬의 종류 번호가 담긴 1차원 배열입니다.
+nums의 길이 N은 1이상 10000이하의 자연수이며 항상 짝수입니다.
+폰켓몬의 종류는 1이상 200000이하의 자연수입니다.
+가장 많은 종류의 폰켓몬을 선택하는 방법이 여러가지일 때에도, 선택할 수 있는 폰캣몬 종류의 개수의 최댓값을 하나만 반환하며 됩니다.
+*/
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <string>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+// 상호베타적 집합 정의
+class DisjointSet {
+private:
+  vector<int> parent, rank;
+
+public:
+  DisjointSet(int size) : parent(size, -1), rank(size, 0) {}
+
+  int find(int node) {
+    if (parent[node] == -1) 
+      return node;
+      
+    //❶ 경로 압축을 하면서 루트노드 찾기  
+    return parent[node] = find(parent[node]); 
+  }
+
+  void merge(int node1, int node2) {
+    int root1 = find(node1);
+    int root2 = find(node2);
+
+    if (root1 != root2) {
+        
+      //❷ 랭크 기반으로 합치기
+      if (rank[root1] > rank[root2]) {
+        parent[root2] = root1;
+      } else if (rank[root1] < rank[root2]) {
+        parent[root1] = root2;
+      } else {
+        parent[root2] = root1;
+        rank[root1]++;
+      }
+    }
+  }
+
+  //❸ 같은 집합에 있는지 확인  
+  bool isCycle(int node1, int node2) {
+    return find(node1) == find(node2); 
+  }
+};
+
+int solution(int n, vector<vector<int>> costs) {
+    
+  //❹ 비용을 기준으로 간선 정렬
+  sort(costs.begin(), costs.end(), [](const vector<int>& a, const vector<int>& b) {
+    return a[2] < b[2];
+  });
+
+  DisjointSet disjointSet(n);
+  int totalCost = 0;
+
+  for (const auto& edge : costs) {
+    int cost = edge[2];
+    int node1 = edge[0];
+    int node2 = edge[1];
+
+    //❺ 사이클 확인 후 없을 경우 합병
+    if (!disjointSet.isCycle(node1, node2)) {
+      disjointSet.merge(node1, node2);
+      totalCost += cost;
+    }
+  }
+
+  return totalCost;
+}
