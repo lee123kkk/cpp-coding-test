@@ -1,0 +1,99 @@
+/*
+인수로 아직 완성되지 않은 9 X 9 스도쿠 배열 board가 있습니다. 
+답을 채우지 않은 부분에서는 0이 들어있습니다.
+스도쿠 규칙에 맞게 채운 배열을 반환하는 solution()함수를 작성하세요.
+해는 유일하지 않습니다.
+스도쿠의 조건에 맞다면 맞느 해라고 생각하시면 됩니다.
+스도쿠의 규칙은 아래와 같습니다.
+가로줄 세로줄에는 1부터 9까지의 숫자가 한 번씩 나타나야 합니다.
+9X9 보드를 채울 9개의 작은 박스에도 1부터 9까지의 숫자가 한 번씩 나타나야 합니다.
+
+제약 조건
+문제에 주어지는 board중 스도쿠를 완성하지 못하는 board는 없다고 가정합니다.
+예를들어 특정 행이나 열에 같은 숫자가 있는 경우는 없습니다.
+
+*/
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+#include <vector>
+
+using namespace std;
+
+vector<vector<int>> board; // 전역 변수로 스도쿠 보드 선언
+
+//❶ 특정 위치에 숫자를 놓을 수 있는지 확인
+bool is_valid(int num, int row, int col) {
+  for (int i = 0; i < 9; i++) {
+    if (board[row][i] == num || board[i][col] == num) return false;
+  }
+  
+  int startRow = row - row % 3, startCol = col - col % 3;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      if (board[i + startRow][j + startCol] == num) return false;
+    }
+  }
+  return true;
+}
+
+//❷ 아직 숫자가 입력되지 않은 위치를 확인 
+pair<int, int> find_empty_position() {
+  for (int row = 0; row < 9; row++) {
+    for (int col = 0; col < 9; col++) {
+      if (board[row][col] == 0) return {row, col};
+    }
+  }
+  return {-1, -1};
+}
+
+void solve_sudoku() {
+  pair<int, int> pos = find_empty_position();
+
+  //❸ 이미 모든 칸이 채워졌다면 수도쿠 종료
+  if (pos.first == -1) {
+    return;  
+  }
+
+  for (int num = 1; num <= 9; num++) {
+    if (is_valid(num, pos.first, pos.second)) {
+      board[pos.first][pos.second] = num;
+      solve_sudoku();
+      // 스도쿠가 완성된 경우 더이상 탐색하지 않기 위핸 조건
+      if(find_empty_position().first == -1) return ;
+      board[pos.first][pos.second] = 0;
+    }
+  }
+}
+
+vector<vector<int>> solution(vector<vector<int>> input_board) {
+  //❹ 인자로 받은 보드를 전역 변수에 복사하고 스도쿠 진행
+  board = input_board; 
+  solve_sudoku();
+  return board;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
